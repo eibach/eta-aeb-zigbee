@@ -1,5 +1,5 @@
 {
-  "name": "eta-pe25-z2m-converter-test",
+  "name": "eta-aeb-z2m-converter-test",
   "private": true,
   "type": "module",
   "description": "Loads the PE25-ZB external converter against the Zigbee2MQTT converter library and checks it",

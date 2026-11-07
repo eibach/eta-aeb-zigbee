@@ -1,5 +1,5 @@
 {
-  "name": "eta-pe25-dashboard-installer",
+  "name": "eta-aeb-dashboard-installer",
   "private": true,
   "type": "module",
   "description": "Installs the ETA PE-25 dashboard into Home Assistant via the WebSocket API",

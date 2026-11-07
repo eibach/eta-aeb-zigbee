@@ -5,7 +5,9 @@ operating panel (*Bedienteil*) that ETA's PC software uses for remote control an
 same port speaks a small binary protocol that is enough to read temperatures and the pellet stock and to send
 a few commands.
 
-This page describes the protocol as **implemented and verified on an ETA PE-25 pellet boiler (built 2008)**.
+This page describes the protocol as **implemented and verified on an ETA PE-25 pellet boiler (built 2008)**. ETA's
+own document calls the controller family **AEB**; a PE-15 belongs to the same controller type as the PE-25 (AEL,
+pellet boiler up to 30 kW) and should behave the same, but this was not tested.
 It is based on ETA's protocol excerpt ("Protokoll µC–PC Auszug", 2007, not redistributed here) plus
 observations on a real boiler. Anything not verified on hardware is marked **(unverified)**.
 

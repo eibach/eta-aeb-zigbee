@@ -1,17 +1,20 @@
-# ETA PE-25 → Zigbee → Home Assistant
+# ETA AEB boilers → Zigbee → Home Assistant
 
-[![CI](https://github.com/eibach/eta-pe25-zigbee/actions/workflows/ci.yml/badge.svg)](https://github.com/eibach/eta-pe25-zigbee/actions/workflows/ci.yml)
+[![CI](https://github.com/eibach/eta-aeb-zigbee/actions/workflows/ci.yml/badge.svg)](https://github.com/eibach/eta-aeb-zigbee/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Bring an older **ETA pellet boiler** (PE-25, built 2008, RS-232 only, no network) into Home Assistant, **over
-Zigbee**, for boiler rooms with no Wi-Fi and no Ethernet.
+Bring an older **ETA pellet boiler** (PE-25, PE-15 and relatives; RS-232 only, no network) into Home Assistant,
+**over Zigbee**, for boiler rooms with no Wi-Fi and no Ethernet.
+
+*AEB* is the name ETA's own protocol document uses for the controller family these boilers share. The
+protocol is documented in [docs/protocol.md](docs/protocol.md).
 
 A small **ESP32-C6** with a MAX3232 level shifter talks the boiler's serial protocol and joins your existing
 Zigbee network as a router. Zigbee2MQTT hands the values to Home Assistant.
 
 ```mermaid
 flowchart LR
-    boiler["ETA PE-25<br/>operating panel DB9"] -- "RS-232<br/>19200 8N1" --> max["MAX3232"]
+    boiler["ETA boiler (AEB controller)<br/>operating panel DB9"] -- "RS-232<br/>19200 8N1" --> max["MAX3232"]
     max -- UART --> esp["ESP32-C6<br/>Zigbee router"]
     esp -. "Zigbee" .-> coord["Zigbee coordinator"]
     coord --> z2m["Zigbee2MQTT"] -- MQTT --> ha["Home Assistant"]
@@ -34,11 +37,22 @@ flowchart LR
 
 The ESP32 is a Zigbee **router**, so it also strengthens your mesh. Values arrive every 30 s.
 
+## Supported boilers
+
+| Boiler | Controller type (ETA's name) | Node | Status |
+|---|---|---|---|
+| **ETA PE-25** (2008) | AEL, pellet boiler up to 30 kW | `0x10` | **verified** against the boiler display |
+| **ETA PE-15** | AEL, pellet boiler up to 30 kW | `0x10` | expected to work out of the box (same controller type per ETA's document), **untested** |
+| other pellet boilers up to 30 kW | AEL | `0x10` | same as above, untested |
+| log-wood (AEC), chips / pellets from 35 kW (AELK), heating extension (AEH) | other index lists | `0x08` / `0x18` / `0x20` | **not supported yet**: ETA's index lists differ, see [docs/protocol.md](docs/protocol.md#5-monitor-list-indices) |
+
+If your boiler works (or does not), please open an issue with the model and what you saw.
+
 ## What you need
 
 | | |
 |---|---|
-| ETA boiler with the DB9 serial port on the operating panel | developed on a **PE-25**; other ETA models of the same controller family should be similar but are untested |
+| ETA boiler with the DB9 serial port on the operating panel | see [Supported boilers](#supported-boilers) |
 | ESP32-C6 board | tested: Waveshare ESP32-C6-DEV-KIT-N8 |
 | MAX3232 module (3.3 V) with DB9, straight DB9 cable, mains USB charger | [docs/hardware.md](docs/hardware.md) |
 | Zigbee coordinator with **Zigbee2MQTT** and Home Assistant | tested: Zigbee2MQTT 2.14.3, HA 2026.10 |
@@ -68,8 +82,8 @@ Details and options: [docs/setup.md](docs/setup.md). Something wrong? [docs/trou
 * **There is no summer / off mode** in this protocol.
 * Sensors that are not installed read exactly 0. The **pellet stock is a counter** that you must correct at the
   controller after every delivery; it can be negative.
-* Only an ETA **PE-25** (pellet boiler up to 30 kW, node `0x10`) was tested. Tested values were compared with
-  the boiler display; nothing else was verified on other models.
+* Only an ETA **PE-25** was tested; its values were compared with the boiler display. Nothing was verified on
+  other models, including the PE-15.
 * Use at your own risk, see the [license](LICENSE). This is an unofficial project and not affiliated with or
   endorsed by ETA Heiztechnik.
 

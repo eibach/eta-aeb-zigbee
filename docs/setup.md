@@ -1,5 +1,7 @@
 # Setup
 
+These steps apply to ETA pellet boilers up to 30 kW with an AEB controller (PE-25 verified, PE-15 untested).
+
 Tested with: ESP-IDF **v5.5.6**, Zigbee2MQTT **2.14.3** (Home Assistant add-on, converter library
 `zigbee-herdsman-converters` 26.125.0), Home Assistant **2026.10**, Waveshare ESP32-C6-DEV-KIT-N8,
 ETA PE-25 (2008).

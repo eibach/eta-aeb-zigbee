@@ -1,0 +1,52 @@
+menu "ETA bridge"
+
+    config ETA_UART_NUM
+        int "UART port connected to the MAX3232"
+        default 1
+
+    config ETA_UART_TX_GPIO
+        int "GPIO for TX (to MAX3232 T1IN)"
+        default 6
+
+    config ETA_UART_RX_GPIO
+        int "GPIO for RX (from MAX3232 R1OUT)"
+        default 7
+
+    config ETA_NODE
+        int "ETA node number (base 0x10 for pellet boilers up to 30 kW + DIP switch)"
+        default 16
+
+    config ETA_REFRESH_S
+        int "Boiler refresh interval in seconds (MC RefreshTime)"
+        range 5 250
+        default 30
+
+    config ETA_CONTROL_ENABLED
+        bool "Allow commands to the boiler (heating mode, boiler on/off, charge hot water)"
+        default y
+        help
+            When disabled, writes from Zigbee are rejected and nothing is ever sent
+            to the boiler except the read-only poll.
+
+    config ETA_SIMULATE
+        bool "Simulate the boiler (no UART, fake values) for testing Zigbee/HA without hardware"
+        default n
+
+    config ETA_LED_ORDER_RGB
+        bool "Status LED colour order is RGB (default: GRB, standard for WS2812)"
+        default n
+
+    config ETA_ZB_PRIMARY_CHANNEL
+        int "Zigbee channel to scan first when joining (11-26)"
+        range 11 26
+        default 11
+        help
+            Set this to the channel of your Zigbee network (Zigbee2MQTT: Settings -> Advanced ->
+            channel). All other channels are scanned afterwards, so a wrong value only slows
+            down the first join.
+
+    config ETA_STATUS_LED_GPIO
+        int "GPIO of the WS2812 status LED (Waveshare ESP32-C6 DevKit: 8)"
+        default 8
+
+endmenu

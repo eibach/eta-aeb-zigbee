@@ -1,0 +1,8 @@
+{
+  "name": "eta-pe25-dashboard-installer",
+  "private": true,
+  "type": "module",
+  "description": "Installs the ETA PE-25 dashboard into Home Assistant via the WebSocket API",
+  "engines": { "node": ">=22" },
+  "dependencies": { "yaml": "2.8.1" }
+}

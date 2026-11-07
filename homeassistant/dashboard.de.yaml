@@ -1,0 +1,136 @@
+# Home Assistant dashboard for the ETA PE-25 bridge (German).
+# Entities use the prefix "eta_pelletkessel" (Zigbee2MQTT device name "ETA Pelletkessel").
+# If your device has another name, replace the prefix (or use install-dashboard.mjs --prefix).
+# Install: see README (raw configuration editor, or node install-dashboard.mjs).
+title: Pelletkessel
+views:
+- title: Pelletkessel
+  path: eta
+  icon: mdi:fire
+  cards:
+  - type: markdown
+    content: |-
+      {% set t = states('sensor.eta_pelletkessel_temperature_boiler') %}
+      {% set fault = is_state('binary_sensor.eta_pelletkessel_fault', 'on') %}
+      {% if t == 'unavailable' %}
+      ## 🔴 ESP32 offline
+      Die Bridge ist im Zigbee-Netz nicht erreichbar (Strom? Funk?).
+      {% elif fault %}
+      ## 🔴 Störung am Kessel
+      Der Kessel hat eine Fehlermeldung gesendet. Sie wird 30 Minuten nach der letzten Meldung zurückgesetzt. Details am Kessel-Display.
+      {% elif t == 'unknown' %}
+      ## 🟡 Kessel antwortet nicht
+      Bridge online, aber keine Daten vom Kessel. Kabel und Stecker prüfen; Werte sind unbekannt.
+      {% else %}
+      ## 🟢 Kessel verbunden
+      Letzte Daten: {{ as_local(states.sensor.eta_pelletkessel_temperature_boiler.last_reported).strftime('%H:%M:%S') }} Uhr.
+      {% endif %}
+      <small>LED am ESP32: grün = alles ok · gelb = Kessel antwortet nicht · rot blinkend = kein Zigbee-Netz · rot dauerhaft = Störung</small>
+  - type: horizontal-stack
+    cards:
+    - type: gauge
+      entity: sensor.eta_pelletkessel_temperature_boiler
+      name: Kessel
+      min: 0
+      max: 100
+      severity:
+        green: 0
+        yellow: 88
+        red: 95
+    - type: gauge
+      entity: sensor.eta_pelletkessel_temperature_flue_gas
+      name: Abgas
+      min: 0
+      max: 300
+      severity:
+        green: 0
+        yellow: 200
+        red: 260
+    - type: gauge
+      entity: sensor.eta_pelletkessel_pellet_stock
+      name: Pelletvorrat
+      min: 0
+      max: 5.5
+      unit: t
+      severity:
+        red: 0
+        yellow: 0.5
+        green: 1
+  - type: entities
+    title: Temperaturen
+    show_header_toggle: false
+    entities:
+    - entity: sensor.eta_pelletkessel_temperature_outside
+      name: Außen
+    - entity: sensor.eta_pelletkessel_temperature_flow_direct
+      name: Vorlauf Direktkreis
+    - entity: sensor.eta_pelletkessel_temperature_flow_mixer0
+      name: Vorlauf Mischerkreis 0
+  - type: vertical-stack
+    cards:
+    - type: markdown
+      content: |-
+        ### Steuerung
+        Befehle gehen direkt an die Heizung. Der Kessel meldet seinen Zustand nicht zurück: ob er läuft, zeigen die Temperaturen und der Status oben.
+    - type: horizontal-stack
+      cards:
+      - type: button
+        name: Kessel einschalten
+        icon: mdi:fire
+        show_state: false
+        icon_height: 48px
+        tap_action:
+          action: perform-action
+          perform_action: select.select_option
+          target:
+            entity_id: select.eta_pelletkessel_boiler_command
+          data:
+            option: boiler_on
+          confirmation:
+            text: Kessel wirklich einschalten?
+        hold_action:
+          action: none
+        double_tap_action:
+          action: none
+      - type: button
+        name: Kessel ausschalten
+        icon: mdi:fire-off
+        show_state: false
+        icon_height: 48px
+        tap_action:
+          action: perform-action
+          perform_action: select.select_option
+          target:
+            entity_id: select.eta_pelletkessel_boiler_command
+          data:
+            option: boiler_off
+          confirmation:
+            text: Kessel wirklich ausschalten?
+        hold_action:
+          action: none
+        double_tap_action:
+          action: none
+  - type: history-graph
+    title: Kessel und Abgas (24 h)
+    hours_to_show: 24
+    entities:
+    - entity: sensor.eta_pelletkessel_temperature_boiler
+      name: Kessel
+    - entity: sensor.eta_pelletkessel_temperature_flue_gas
+      name: Abgas
+  - type: history-graph
+    title: Außen und Vorläufe (24 h)
+    hours_to_show: 24
+    entities:
+    - entity: sensor.eta_pelletkessel_temperature_outside
+      name: Außen
+    - entity: sensor.eta_pelletkessel_temperature_flow_direct
+      name: Vorlauf Direktkreis
+    - entity: sensor.eta_pelletkessel_temperature_flow_mixer0
+      name: Vorlauf Mischerkreis 0
+  - type: history-graph
+    title: Pelletvorrat (7 Tage)
+    hours_to_show: 168
+    entities:
+    - entity: sensor.eta_pelletkessel_pellet_stock
+      name: Pelletvorrat (t)

@@ -1,0 +1,136 @@
+# Home Assistant dashboard for the ETA PE-25 bridge (English).
+# Entities use the prefix "eta_pelletkessel" (Zigbee2MQTT device name "ETA Pelletkessel").
+# If your device has another name, replace the prefix (or use install-dashboard.mjs --prefix).
+# Install: see README (raw configuration editor, or node install-dashboard.mjs).
+title: Pellet boiler
+views:
+- title: Pellet boiler
+  path: eta
+  icon: mdi:fire
+  cards:
+  - type: markdown
+    content: |-
+      {% set t = states('sensor.eta_pelletkessel_temperature_boiler') %}
+      {% set fault = is_state('binary_sensor.eta_pelletkessel_fault', 'on') %}
+      {% if t == 'unavailable' %}
+      ## 🔴 ESP32 offline
+      The bridge is not reachable in the Zigbee network (power? radio?).
+      {% elif fault %}
+      ## 🔴 Boiler fault
+      The boiler sent an error message. The flag clears 30 minutes after the last message. Details on the boiler display.
+      {% elif t == 'unknown' %}
+      ## 🟡 Boiler not answering
+      Bridge online, but no data from the boiler. Check the cable and connectors; values are unknown.
+      {% else %}
+      ## 🟢 Boiler connected
+      Last data: {{ as_local(states.sensor.eta_pelletkessel_temperature_boiler.last_reported).strftime('%H:%M:%S') }}.
+      {% endif %}
+      <small>LED on the ESP32: green = all ok · yellow = boiler not answering · red blinking = no Zigbee network · red steady = fault</small>
+  - type: horizontal-stack
+    cards:
+    - type: gauge
+      entity: sensor.eta_pelletkessel_temperature_boiler
+      name: Boiler
+      min: 0
+      max: 100
+      severity:
+        green: 0
+        yellow: 88
+        red: 95
+    - type: gauge
+      entity: sensor.eta_pelletkessel_temperature_flue_gas
+      name: Flue gas
+      min: 0
+      max: 300
+      severity:
+        green: 0
+        yellow: 200
+        red: 260
+    - type: gauge
+      entity: sensor.eta_pelletkessel_pellet_stock
+      name: Pellet stock
+      min: 0
+      max: 5.5
+      unit: t
+      severity:
+        red: 0
+        yellow: 0.5
+        green: 1
+  - type: entities
+    title: Temperatures
+    show_header_toggle: false
+    entities:
+    - entity: sensor.eta_pelletkessel_temperature_outside
+      name: Outside
+    - entity: sensor.eta_pelletkessel_temperature_flow_direct
+      name: Flow direct circuit
+    - entity: sensor.eta_pelletkessel_temperature_flow_mixer0
+      name: Flow mixer circuit 0
+  - type: vertical-stack
+    cards:
+    - type: markdown
+      content: |-
+        ### Control
+        Commands go straight to the heating system. The boiler does not report its state back: the temperatures and the status above show whether it is running.
+    - type: horizontal-stack
+      cards:
+      - type: button
+        name: Switch boiler on
+        icon: mdi:fire
+        show_state: false
+        icon_height: 48px
+        tap_action:
+          action: perform-action
+          perform_action: select.select_option
+          target:
+            entity_id: select.eta_pelletkessel_boiler_command
+          data:
+            option: boiler_on
+          confirmation:
+            text: Really switch the boiler on?
+        hold_action:
+          action: none
+        double_tap_action:
+          action: none
+      - type: button
+        name: Switch boiler off
+        icon: mdi:fire-off
+        show_state: false
+        icon_height: 48px
+        tap_action:
+          action: perform-action
+          perform_action: select.select_option
+          target:
+            entity_id: select.eta_pelletkessel_boiler_command
+          data:
+            option: boiler_off
+          confirmation:
+            text: Really switch the boiler off?
+        hold_action:
+          action: none
+        double_tap_action:
+          action: none
+  - type: history-graph
+    title: Boiler and flue gas (24 h)
+    hours_to_show: 24
+    entities:
+    - entity: sensor.eta_pelletkessel_temperature_boiler
+      name: Boiler
+    - entity: sensor.eta_pelletkessel_temperature_flue_gas
+      name: Flue gas
+  - type: history-graph
+    title: Outside and flows (24 h)
+    hours_to_show: 24
+    entities:
+    - entity: sensor.eta_pelletkessel_temperature_outside
+      name: Outside
+    - entity: sensor.eta_pelletkessel_temperature_flow_direct
+      name: Flow direct circuit
+    - entity: sensor.eta_pelletkessel_temperature_flow_mixer0
+      name: Flow mixer circuit 0
+  - type: history-graph
+    title: Pellet stock (7 days)
+    hours_to_show: 168
+    entities:
+    - entity: sensor.eta_pelletkessel_pellet_stock
+      name: Pellet stock (t)

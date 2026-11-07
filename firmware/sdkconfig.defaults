@@ -1,0 +1,15 @@
+CONFIG_IDF_TARGET="esp32c6"
+
+# 8 MB flash (Waveshare ESP32-C6-DEV-KIT-N8). Other boards: change this to your flash size.
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# Zigbee router (mains powered, always listening)
+CONFIG_ZB_ENABLED=y
+CONFIG_ZB_ZCZR=y
+
+# The on-board WS2812 of the Waveshare ESP32-C6-DEV-KIT-N8 is wired in RGB order (usually WS2812 is GRB).
+# The boot self-test shows red, green, blue: if you see green, red, blue, set this to y; if red, green, blue, to n.
+CONFIG_ETA_LED_ORDER_RGB=y

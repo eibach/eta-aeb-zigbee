@@ -1,0 +1,20 @@
+# ESP-IDF build output and generated config
+firmware/build/
+firmware/build_*/
+firmware/sdkconfig
+firmware/sdkconfig.old
+firmware/sdkconfig.*.cfg
+firmware/managed_components/
+tools/scan154/build/
+tools/scan154/sdkconfig
+tools/scan154/sdkconfig.old
+tools/scan154/managed_components/
+tools/scan154/dependencies.lock
+
+# Node
+node_modules/
+
+# Local secrets / logs
+.env
+*.log
+__pycache__/

@@ -25,8 +25,8 @@ make test            # host tests + converter tests + dashboard parse check
 make host-test       # only the C protocol library (gcc, with ASan/UBSan)
 ```
 
-CI (`.github/workflows/ci.yml`) runs the same three checks plus a firmware build in the ESP-IDF container.
-The firmware CI job has not been run yet; the same build was verified locally with ESP-IDF v5.5.6.
+CI (`.github/workflows/ci.yml`) runs the same three checks plus a firmware build in the ESP-IDF container
+(ESP-IDF v5.5.6, target esp32c6).
 
 The protocol library is plain C99 so it can be tested without hardware. `test_real_capture` replays a poll and a
 reply captured on a real PE-25 (the poll we build is byte-identical to the one the boiler answered, the reply

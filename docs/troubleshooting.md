@@ -55,6 +55,12 @@ The bridge is online but the boiler is not answering.
   boiler up to 30 kW). Other controller types have different lists, see
   [protocol.md](protocol.md#5-monitor-list-indices).
 
+## Dashboard says "Boiler fault" after I used a command
+
+Expected for now: the boiler announces every command with an `IM` frame (its "changed via SMS" notice), which the
+firmware counts as a fault and holds for 30 minutes. It clears by itself. See [protocol.md](protocol.md#34-im--messages).
+To see the real text, watch the serial log: it prints `boiler error: <text>` for every `IM` frame.
+
 ## Commands
 
 * **Boiler on / off** work (verified). The boiler has no confirmation: the select only shows the last command and

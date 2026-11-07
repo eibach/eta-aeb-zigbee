@@ -17,13 +17,17 @@ flowchart LR
     coord --> z2m["Zigbee2MQTT"] -- MQTT --> ha["Home Assistant"]
 ```
 
+![Dashboard](docs/images/dashboard.png)
+
+*The dashboard (English variant; the history graphs below these cards are not shown).*
+
 ## What you get
 
 * **Temperatures:** boiler, flue gas, outside, flow (direct circuit and mixer circuit 0), plus buffer, hot water
   tank and external heat if your plant has them
 * **Pellet stock** in tons (the controller's own counter)
 * **Boiler on / off** commands (one-shot, with a confirmation dialog on the dashboard)
-* **Fault flag** when the boiler sends an error message
+* **Fault flag** when the boiler sends a message (see the caveat below)
 * **Status LED** on the board and a **status card** on the dashboard (connected / boiler silent / fault / offline)
 * A ready-made **dashboard** (English and German) with gauges, history graphs and confirm buttons
 * A **documented protocol**: most of what the boiler's serial port offers is described in [docs/protocol.md](docs/protocol.md)
@@ -58,6 +62,9 @@ Details and options: [docs/setup.md](docs/setup.md). Something wrong? [docs/trou
   not. Build with *Allow commands* off if you only want to read.
 * **Heating-mode commands (auto/day/night) are not reliable** on the test boiler: it showed "changed via SMS" but the
   mode did not change (probably the per-circuit *SMS Erlauben* setting). They are not on the dashboard.
+* **The fault flag over-reports.** The boiler's `IM` frames carry information notices as well as errors: after every
+  command you send, it announces "changed via SMS", which this firmware currently counts as a fault (for 30 minutes).
+  A real error has never been observed yet. See [docs/protocol.md](docs/protocol.md#34-im--messages).
 * **There is no summer / off mode** in this protocol.
 * Sensors that are not installed read exactly 0. The **pellet stock is a counter** that you must correct at the
   controller after every delivery; it can be negative.

@@ -109,11 +109,19 @@ Things to know:
 
 No payload: `7b 4d 45 00 00 7d`. Not used by this project (it keeps polling).
 
-### 3.4 `IM` – error message
+### 3.4 `IM` – messages
 
-Payload: error text in ASCII, **not** NUL-terminated. Sent by the boiler unprompted. There is no
-"error cleared" message. **(unverified: no error occurred during testing)** This project shows a fault flag and
-holds it for 30 minutes after the last message.
+Payload: message text in ASCII, **not** NUL-terminated. Sent by the boiler unprompted.
+
+ETA's document calls this an error message, but the boiler also uses it for **information notices**: each `IH`
+command below made the boiler print "changed via SMS" on its display, and within about two seconds an `IM`
+frame arrived (observed through its timing: the fault flag of this project rose two seconds after the first
+command, after every command). The text of those frames was not captured, and no real error message has been
+seen yet, so the texts of real errors are **unknown**.
+
+There is no "message cleared" frame. This project raises a fault flag on every `IM` and holds it for 30 minutes
+after the last one, so it **also fires after your own commands**. A cleaner approach would ignore frames that
+arrive within a few seconds after an `IH` command and expose the text.
 
 ### 3.5 `IH` – commands
 
